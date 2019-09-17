@@ -27,7 +27,7 @@ class GalleryExtractor(private val domSelectors: DomSelectors, private val parse
         val gallery = extractGallery(gallerySelector, htmlDocument, html, baseuri)
         val titleParsed = parserService.components(title).response
 
-        return Response(ImageGalleryResult(ImageGallery(uri.host, title, titleParsed, gallery)))
+        return Response(ImageGalleryResult(ImageGallery(galleryUrl, uri.host, title, titleParsed, gallery)))
     }
 
     private fun extractGallery(selector: Gallery, htmlDocument: Document, html: String, baseuri: String): List<ImageInfo> {
