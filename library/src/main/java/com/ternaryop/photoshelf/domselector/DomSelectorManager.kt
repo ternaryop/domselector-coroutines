@@ -6,6 +6,7 @@ import android.provider.DocumentsContract
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import java.io.FileNotFoundException
+import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 
@@ -25,7 +26,7 @@ object DomSelectorManager {
             if (domSelectors == null) {
                 domSelectors = try {
                     openConfig(context)
-                } catch (e: Exception) {
+                } catch (e: IOException) {
                     DomSelectors(-1, emptyList())
                 }
             }
@@ -46,7 +47,7 @@ object DomSelectorManager {
                 context.deleteFile(SELECTORS_FILENAME)
                 assetsSelectors
             }
-        } catch (e : FileNotFoundException) {
+        } catch (e: FileNotFoundException) {
             context.assets.open(SELECTORS_FILENAME).use { jsonBuilder.domSelectors(it) }
         }
     }

@@ -14,6 +14,8 @@ import java.util.regex.Pattern
 
 fun String.normalizeWhitespaces() = replace("\\s{2,}", " ")
 
+private const val MIN_THUMBNAIL_WIDTH = 400
+
 class GalleryExtractor(private val domSelectors: DomSelectors, private val parserService: ParserService) {
     suspend fun getGallery(galleryUrl: String): Response<ImageGalleryResult> {
         val uri = Uri.parse(galleryUrl)
@@ -30,7 +32,12 @@ class GalleryExtractor(private val domSelectors: DomSelectors, private val parse
         return Response(ImageGalleryResult(ImageGallery(galleryUrl, uri.host, title, titleParsed, gallery)))
     }
 
-    private fun extractGallery(selector: Gallery, htmlDocument: Document, html: String, baseuri: String): List<ImageInfo> {
+    private fun extractGallery(
+        selector: Gallery,
+        htmlDocument: Document,
+        html: String,
+        baseuri: String
+    ): List<ImageInfo> {
         if (selector.regExp != null) {
             return extractByRegExp(selector, html.replace("""([\n\r\t])""".toRegex(), ""))
         }
@@ -48,6 +55,7 @@ class GalleryExtractor(private val domSelectors: DomSelectors, private val parse
         val galleryItemBuilder = GalleryItemBuilder(domSelectors)
         val list = mutableListOf<ImageInfo>()
 
+        @Suppress("LoopWithTooManyJumpStatements")
         while (matches.find()) {
             val thumbnailURL = matches.group(thumbIndex) ?: continue
             val destinationDocumentURL = matches.group(imageIndex) ?: continue
@@ -58,7 +66,11 @@ class GalleryExtractor(private val domSelectors: DomSelectors, private val parse
         return list
     }
 
-    private fun extractImageFromMultiPage(selector: Gallery, startPageDocument: Document, baseuri: String): List<ImageInfo> {
+    private fun extractImageFromMultiPage(
+        selector: Gallery,
+        startPageDocument: Document,
+        baseuri: String
+    ): List<ImageInfo> {
         val list = mutableListOf<ImageInfo>()
 
         if (selector.multiPage === null) {
@@ -85,7 +97,9 @@ class GalleryExtractor(private val domSelectors: DomSelectors, private val parse
 
     private fun buildGalleryItem(selector: Gallery, thumbnailImage: Element, baseuri: String): ImageInfo? {
         val galleryItemBuilder = GalleryItemBuilder(domSelectors)
-        var galleryItem = galleryItemBuilder.fromSrcSet(selector, thumbnailImage, 400)
+        var galleryItem = galleryItemBuilder.fromSrcSet(selector, thumbnailImage,
+            MIN_THUMBNAIL_WIDTH
+        )
 
         if (galleryItem == null) {
             galleryItem = galleryItemBuilder.fromThumbnailElement(selector, thumbnailImage, baseuri)

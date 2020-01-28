@@ -18,7 +18,8 @@ data class Gallery(
     val regExpThumbUrlIndex: Int = 0,
     val title: String? = null,
     val thumbImageSelAttr: String = "src",
-    val multiPage: String? = null) {
+    val multiPage: String? = null
+) {
     val hasImage: Boolean
         get() = isImageDirectUrl
 }
@@ -27,7 +28,8 @@ class Image(
     val css: String? = null,
     val regExp: String? = null,
     val pageChain: List<PageChain>? = null,
-    val postData: PostData? = null) {
+    val postData: PostData? = null
+) {
     val hasImage: Boolean
         get() = css !== null || regExp !== null || pageChain !== null
 }
@@ -39,7 +41,8 @@ data class PostData(val imgContinue: String)
 data class Selector(
     val urlPattern: String = "",
     val image: Image = Image(),
-    val gallery: Gallery = Gallery()) {
+    val gallery: Gallery = Gallery()
+) {
     val hasImage: Boolean
         get() = gallery.hasImage || image.hasImage
 }

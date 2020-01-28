@@ -4,6 +4,7 @@ import com.ternaryop.photoshelf.api.extractor.ImageInfo
 import com.ternaryop.photoshelf.domselector.util.html.HtmlDocumentSupport
 import org.jsoup.nodes.Element
 
+@Suppress("ReturnCount")
 class GalleryItemBuilder(private val domSelectors: DomSelectors) {
     fun fromSrcSet(selector: Gallery, thumbnailImage: Element, minThumbWidth: Int): ImageInfo? {
         val srcSet = HtmlDocumentSupport.parseSrcSet(thumbnailImage.attr("srcset")) ?: return null

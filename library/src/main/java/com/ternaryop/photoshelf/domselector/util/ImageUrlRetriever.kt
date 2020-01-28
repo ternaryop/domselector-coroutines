@@ -31,7 +31,7 @@ suspend fun DomSelectors.retrieveImageUri(imageInfo: ImageInfo, destDirectory: F
 
 private suspend fun DomSelectors.getImageURL(imageInfo: ImageInfo): String? {
     // parse document only if the imageURL is not set (ie isn't cached)
-    return imageInfo.imageUrl//?.let { it }
+    return imageInfo.imageUrl
         ?: imageInfo.documentUrl?.let { ImageExtractor(this).getImageURL(it) }
 }
 

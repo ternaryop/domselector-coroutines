@@ -33,7 +33,6 @@ object HtmlDocumentSupport {
         var location: String
         var continueFollow = true
 
-
         do {
             conn = url.openConnection() as HttpURLConnection
             conn.setRequestProperty("User-Agent", DESKTOP_USER_AGENT)
@@ -108,6 +107,7 @@ object HtmlDocumentSupport {
         return list
     }
 
+    @Suppress("ReturnCount")
     fun encodeUrlRfc3986(url: String): String {
         val uri = Uri.parse(url)
         val scheme = uri.scheme ?: return url
