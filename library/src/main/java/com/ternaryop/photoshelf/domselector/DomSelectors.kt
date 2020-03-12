@@ -4,9 +4,21 @@ import java.util.regex.Pattern
 
 val emptySelector = Selector("", Image(), Gallery())
 
-data class DomSelectors(val version: Int, val selectors: List<Selector>) {
+interface DomSelectors {
+    val version: Int
+    val selectors: List<Selector>
     fun getSelectorFromUrl(url: String): Selector {
         return selectors.firstOrNull { Pattern.compile(it.urlPattern).matcher(url).find() } ?: emptySelector
+    }
+}
+
+internal class MutableDomSelectors(
+    override var version: Int,
+    override var selectors: List<Selector>
+) : DomSelectors {
+    fun from(source: DomSelectors) {
+        version = source.version
+        selectors = source.selectors
     }
 }
 

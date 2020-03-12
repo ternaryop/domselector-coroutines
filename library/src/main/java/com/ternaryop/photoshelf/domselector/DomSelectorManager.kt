@@ -10,7 +10,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 
-private fun Gson.domSelectors(input: InputStream) = fromJson(InputStreamReader(input), DomSelectors::class.java)
+private fun Gson.domSelectors(input: InputStream) = fromJson(InputStreamReader(input), MutableDomSelectors::class.java)
 
 /**
  * Obtain the DOM selector used to extract gallery and images contained inside a given url
@@ -18,16 +18,24 @@ private fun Gson.domSelectors(input: InputStream) = fromJson(InputStreamReader(i
  * @author dave
  */
 object DomSelectorManager {
-    private var domSelectors: DomSelectors? = null
+    private var domSelectors: MutableDomSelectors? = null
     private const val SELECTORS_FILENAME = "domSelectors.json"
 
-    fun selectors(context: Context): DomSelectors {
-        synchronized(DomSelectors::class.java) {
-            if (domSelectors == null) {
-                domSelectors = try {
-                    openConfig(context)
-                } catch (e: IOException) {
-                    DomSelectors(-1, emptyList())
+    fun selectors(context: Context): DomSelectors = buildSelectors(context, false)
+
+    private fun buildSelectors(context: Context, reloadConfig: Boolean): DomSelectors {
+        synchronized(MutableDomSelectors::class.java) {
+            val forceReload = if (domSelectors == null) {
+                domSelectors = MutableDomSelectors(-1, emptyList())
+                true
+            } else {
+                reloadConfig
+            }
+
+            if (forceReload) {
+                try {
+                    domSelectors!!.from(openConfig(context))
+                } catch (ignored: IOException) {
                 }
             }
         }
@@ -60,7 +68,7 @@ object DomSelectorManager {
         checkNotNull(context.contentResolver.openInputStream(uri)) { "Unable to read configuration" }.also { stream ->
             copyConfig(context, stream)
             DocumentsContract.deleteDocument(context.contentResolver, uri)
-            domSelectors = null
+            buildSelectors(context, true)
         }
     }
 }
