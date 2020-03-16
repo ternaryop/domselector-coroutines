@@ -34,7 +34,7 @@ buildscript {
     }
 
     ext.publishPackage = [
-        version: '1.0.4',
+        version: '1.0.5',
         groupId: 'com.ternaryop.photoshelf',
         artifactId: 'domselector-coroutines',
         bintrayRepoName: 'DomSelector',
