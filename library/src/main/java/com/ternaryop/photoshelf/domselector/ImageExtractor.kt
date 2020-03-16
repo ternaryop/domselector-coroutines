@@ -31,7 +31,7 @@ class ImageExtractor(private val domSelectors: DomSelectors) {
     }
 
     private suspend fun urlFromCSS3Selector(selector: Image, documentUrl: String): String {
-        return getDocumentFromUrl(documentUrl).select(selector.css).attr("src") ?: ""
+        return getDocumentFromUrl(documentUrl).select(selector.css).attr(selector.selAttr) ?: ""
     }
 
     private suspend fun urlFromChain(selector: Image, documentUrl: String): String {

@@ -40,7 +40,8 @@ class Image(
     val css: String? = null,
     val regExp: String? = null,
     val pageChain: List<PageChain>? = null,
-    val postData: PostData? = null
+    val postData: PostData? = null,
+    val selAttr: String = "src"
 ) {
     val hasImage: Boolean
         get() = css !== null || regExp !== null || pageChain !== null
