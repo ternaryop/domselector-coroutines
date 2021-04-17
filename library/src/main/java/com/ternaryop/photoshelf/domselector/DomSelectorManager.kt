@@ -3,14 +3,15 @@ package com.ternaryop.photoshelf.domselector
 import android.content.Context
 import android.net.Uri
 import android.provider.DocumentsContract
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
+import com.squareup.moshi.Moshi
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStream
-import java.io.InputStreamReader
 
-private fun Gson.domSelectors(input: InputStream) = fromJson(InputStreamReader(input), MutableDomSelectors::class.java)
+internal fun Moshi.domSelectors(input: InputStream) =
+    input.bufferedReader().use {
+        checkNotNull(adapter(MutableDomSelectors::class.java).fromJson(it.readText()))
+    }
 
 /**
  * Obtain the DOM selector used to extract gallery and images contained inside a given url
@@ -43,7 +44,9 @@ object DomSelectorManager {
     }
 
     private fun openConfig(context: Context): DomSelectors {
-        val jsonBuilder = GsonBuilder().create()
+        val jsonBuilder = Moshi
+            .Builder()
+            .build()
         return try {
             // if an imported file exists and its version is minor than the file in assets we delete it
             val importedSelectors = context.openFileInput(SELECTORS_FILENAME).use { jsonBuilder.domSelectors(it) }
@@ -61,7 +64,9 @@ object DomSelectorManager {
     }
 
     private fun copyConfig(context: Context, input: InputStream) {
-        input.use { stream -> context.openFileOutput(SELECTORS_FILENAME, 0).use { out -> stream.copyTo(out) } }
+        input.use { stream -> context.openFileOutput(SELECTORS_FILENAME, 0).use { out -> stream.copyTo(
+            out
+        ) } }
     }
 
     fun upgradeConfig(context: Context, uri: Uri) {

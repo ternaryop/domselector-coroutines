@@ -1,5 +1,6 @@
 package com.ternaryop.photoshelf.domselector
 
+import com.squareup.moshi.JsonClass
 import java.util.regex.Pattern
 
 val emptySelector = Selector("", Image(), Gallery())
@@ -12,6 +13,7 @@ interface DomSelectors {
     }
 }
 
+@JsonClass(generateAdapter = true)
 internal class MutableDomSelectors(
     override var version: Int,
     override var selectors: List<Selector>
@@ -22,6 +24,7 @@ internal class MutableDomSelectors(
     }
 }
 
+@JsonClass(generateAdapter = true)
 data class Gallery(
     val container: String = "a img",
     val isImageDirectUrl: Boolean = false,
@@ -36,6 +39,7 @@ data class Gallery(
         get() = isImageDirectUrl
 }
 
+@JsonClass(generateAdapter = true)
 class Image(
     val css: String? = null,
     val regExp: String? = null,
@@ -47,10 +51,13 @@ class Image(
         get() = css !== null || regExp !== null || pageChain !== null
 }
 
+@JsonClass(generateAdapter = true)
 data class PageChain(val pageSel: String, val selAttr: String)
 
+@JsonClass(generateAdapter = true)
 data class PostData(val imgContinue: String)
 
+@JsonClass(generateAdapter = true)
 data class Selector(
     val urlPattern: String = "",
     val image: Image = Image(),
