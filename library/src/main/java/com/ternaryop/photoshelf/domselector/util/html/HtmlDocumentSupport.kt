@@ -19,7 +19,8 @@ data class SrcSetItem(val width: Int, val url: String)
  */
 @Suppress("MemberVisibilityCanBePrivate")
 object HtmlDocumentSupport {
-    const val DESKTOP_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:57.0) Gecko/20100101 Firefox/57.0"
+    const val DESKTOP_USER_AGENT =
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:57.0) Gecko/20100101 Firefox/57.0"
 
     /**
      * Open connection using the DESKTOP_USER_AGENT
@@ -27,7 +28,11 @@ object HtmlDocumentSupport {
      * @return the connection
      * @throws IOException when open fails
      */
-    fun openConnection(urlString: String, postData: String? = null): HttpURLConnection {
+    fun openConnection(
+        urlString: String,
+        postData: String? = null,
+        userAgent: String? = DESKTOP_USER_AGENT
+    ): HttpURLConnection {
         var url = URL(urlString)
         var conn: HttpURLConnection
         var location: String
@@ -35,7 +40,7 @@ object HtmlDocumentSupport {
 
         do {
             conn = url.openConnection() as HttpURLConnection
-            conn.setRequestProperty("User-Agent", DESKTOP_USER_AGENT)
+            conn.setRequestProperty("User-Agent", userAgent)
             conn.instanceFollowRedirects = false
 
             if (postData != null) {
@@ -68,11 +73,15 @@ object HtmlDocumentSupport {
         return "$baseuri/$rel"
     }
 
-    fun download(url: String, postData: String? = null): String {
+    fun download(
+        url: String,
+        postData: String? = null,
+        userAgent: String? = DESKTOP_USER_AGENT
+    ): String {
         var connection: HttpURLConnection? = null
 
         try {
-            connection = openConnection(url, postData)
+            connection = openConnection(url, postData, userAgent)
             ByteArrayOutputStream().use { os ->
                 val bos = BufferedOutputStream(os)
                 connection.inputStream?.use { it.copyTo(bos, BUFFER_SIZE) }

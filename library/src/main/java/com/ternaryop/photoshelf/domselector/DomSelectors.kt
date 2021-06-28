@@ -3,7 +3,7 @@ package com.ternaryop.photoshelf.domselector
 import com.squareup.moshi.JsonClass
 import java.util.regex.Pattern
 
-val emptySelector = Selector("", Image(), Gallery())
+val emptySelector = Selector("", null, Image(), Gallery())
 
 interface DomSelectors {
     val version: Int
@@ -60,6 +60,7 @@ data class PostData(val imgContinue: String)
 @JsonClass(generateAdapter = true)
 data class Selector(
     val urlPattern: String = "",
+    val userAgent: String? = null,
     val image: Image = Image(),
     val gallery: Gallery = Gallery()
 ) {

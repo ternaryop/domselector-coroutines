@@ -70,7 +70,8 @@ class ImageExtractor(private val domSelectors: DomSelectors) {
     }
 
     private suspend fun getDocumentFromUrl(url: String) = coroutineScope {
-        val domSelector = domSelectors.getSelectorFromUrl(url).image
-        Jsoup.parse(HtmlDocumentSupport.download(url, domSelector.postData?.imgContinue))
+        val domSelector = domSelectors.getSelectorFromUrl(url)
+        val image = domSelector.image
+        Jsoup.parse(HtmlDocumentSupport.download(url, image.postData?.imgContinue, domSelector.userAgent))
     }
 }

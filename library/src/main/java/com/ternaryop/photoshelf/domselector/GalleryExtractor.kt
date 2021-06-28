@@ -1,6 +1,5 @@
 package com.ternaryop.photoshelf.domselector
 
-import android.net.Uri
 import com.ternaryop.photoshelf.api.Response
 import com.ternaryop.photoshelf.api.extractor.ImageGallery
 import com.ternaryop.photoshelf.api.extractor.ImageGalleryResult
@@ -10,6 +9,7 @@ import com.ternaryop.photoshelf.domselector.util.html.HtmlDocumentSupport
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import java.net.URL
 import java.util.regex.Pattern
 
 fun String.normalizeWhitespaces() = replace("\\s{2,}", " ")
@@ -18,11 +18,11 @@ private const val MIN_THUMBNAIL_WIDTH = 400
 
 class GalleryExtractor(private val domSelectors: DomSelectors, private val parserService: ParserService) {
     suspend fun getGallery(galleryUrl: String): Response<ImageGalleryResult> {
-        val uri = Uri.parse(galleryUrl)
-        val uriScheme = checkNotNull(uri.scheme) { "Invalid gallery url: $galleryUrl" }
-        val html = HtmlDocumentSupport.download(galleryUrl)
-        val htmlDocument = Jsoup.parse(html)
+        val uri = URL(galleryUrl)
+        val uriScheme = checkNotNull(uri.protocol) { "Invalid gallery url: $galleryUrl" }
         val selectorFromURL = domSelectors.getSelectorFromUrl(galleryUrl)
+        val html = HtmlDocumentSupport.download(galleryUrl, userAgent = selectorFromURL.userAgent)
+        val htmlDocument = Jsoup.parse(html)
         val gallerySelector = selectorFromURL.gallery
         val title = findTitle(gallerySelector, htmlDocument)
         val baseuri = uriScheme + "://" + uri.host
@@ -79,8 +79,8 @@ class GalleryExtractor(private val domSelectors: DomSelectors, private val parse
         var element: Element? = startPageDocument.select(selector.multiPage).first()
         while (element != null) {
             val pageUrl = HtmlDocumentSupport.absUrl(baseuri, element.attr("href"))
-            val pageDocument = Jsoup.parse(HtmlDocumentSupport.download(pageUrl))
             val pageUrlSel = domSelectors.getSelectorFromUrl(pageUrl)
+            val pageDocument = Jsoup.parse(HtmlDocumentSupport.download(pageUrl, userAgent = pageUrlSel.userAgent))
             list += extractImages(pageUrlSel.gallery, pageDocument, pageUrl)
             element = pageDocument.select(selector.multiPage).first()
         }
