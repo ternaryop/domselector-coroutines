@@ -13,7 +13,7 @@ import org.junit.Test
 class DomSelectorUnitTest: AbsDomSelectorUnitTest() {
     @Test
     fun configVersionTest() {
-        Assert.assertTrue(domSelectors.version == 6)
+        Assert.assertTrue("The DOM config version has been changed", domSelectors.version == 7)
     }
 
     @Test

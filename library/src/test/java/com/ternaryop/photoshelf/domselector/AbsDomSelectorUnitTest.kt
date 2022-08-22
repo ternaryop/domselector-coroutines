@@ -6,7 +6,7 @@ import org.junit.Before
 import java.io.FileInputStream
 import java.util.*
 
-abstract class AbsDomSelectorUnitTest {
+open class AbsDomSelectorUnitTest {
     lateinit var properties: Properties
     lateinit var domSelectors: DomSelectors
 

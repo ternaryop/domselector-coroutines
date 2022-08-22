@@ -111,7 +111,7 @@ object HtmlDocumentSupport {
                 list.add(SrcSetItem(pair[1].trim().replace("w", "").toInt(), pair[0].trim()))
             }
         }
-        list.sortWith(Comparator { lhr, rhs -> lhr.width - rhs.width })
+        list.sortWith { lhr, rhs -> lhr.width - rhs.width }
 
         return list
     }

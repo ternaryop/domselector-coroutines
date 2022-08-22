@@ -8,10 +8,10 @@ import org.jsoup.nodes.Element
 class GalleryItemBuilder(private val domSelectors: DomSelectors) {
     fun fromSrcSet(selector: Gallery, thumbnailImage: Element, minThumbWidth: Int): ImageInfo? {
         val srcSet = HtmlDocumentSupport.parseSrcSet(thumbnailImage.attr("srcset")) ?: return null
-        var largeImage = thumbnailImage.parent().attr("href")
+        var largeImage = thumbnailImage.parent()?.attr("href")
         // Prefer always the parent url if present
         // this could resolve from small images on srcSet
-        if (largeImage.isBlank()) {
+        if (largeImage == null || largeImage.isBlank()) {
             largeImage = srcSet.last().url
         }
         val srcSetItem = srcSet.firstOrNull { it.width >= minThumbWidth } ?: return null
@@ -25,7 +25,7 @@ class GalleryItemBuilder(private val domSelectors: DomSelectors) {
     }
 
     fun fromThumbnailElement(selector: Gallery, thumbnailImage: Element, baseuri: String): ImageInfo? {
-        val href = thumbnailImage.parent().attr("href")
+        val href = thumbnailImage.parent()?.attr("href") ?: return null
         if (href.isBlank()) {
             return null
         }

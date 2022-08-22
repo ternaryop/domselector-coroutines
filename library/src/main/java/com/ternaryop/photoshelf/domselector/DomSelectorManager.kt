@@ -58,7 +58,7 @@ object DomSelectorManager {
                 context.deleteFile(SELECTORS_FILENAME)
                 assetsSelectors
             }
-        } catch (e: FileNotFoundException) {
+        } catch (ignored: FileNotFoundException) {
             context.assets.open(SELECTORS_FILENAME).use { jsonBuilder.domSelectors(it) }
         }
     }

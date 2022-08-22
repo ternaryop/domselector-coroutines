@@ -1,2 +1,1 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.ternaryop.photoshelf.domselector"/>
+<manifest package="com.ternaryop.photoshelf.domselector" />
