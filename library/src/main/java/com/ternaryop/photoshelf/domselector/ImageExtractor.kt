@@ -9,17 +9,18 @@ import java.util.regex.Pattern
 
 class ImageExtractor(private val domSelectors: DomSelectors) {
     suspend fun getImageURL(documentUrl: String): String {
-        val selector = domSelectors.getSelectorFromUrl(documentUrl).image
+        val selector = domSelectors.getSelectorFromUrl(documentUrl)
+        val image = selector.image
         var url = ""
 
-        if (selector.css != null) {
-            url = urlFromCSS3Selector(selector, documentUrl)
+        if (image.css != null) {
+            url = urlFromCSS3Selector(image, documentUrl)
         }
-        if (url.isBlank() && selector.regExp != null) {
+        if (url.isBlank() && image.regExp != null) {
             url = urlFromRegExp(selector, documentUrl)
         }
-        if (url.isBlank() && selector.pageChain != null) {
-            url = urlFromChain(selector, documentUrl)
+        if (url.isBlank() && image.pageChain != null) {
+            url = urlFromChain(image, documentUrl)
         }
         if (url.isBlank()) {
             url = documentUrl
@@ -40,10 +41,12 @@ class ImageExtractor(private val domSelectors: DomSelectors) {
         return ""
     }
 
-    private fun urlFromRegExp(selector: Image, documentUrl: String): String {
-        val html = HtmlDocumentSupport.download(documentUrl).replace("""([\n\r\t])""".toRegex(), "")
-        selector.regExp?.apply {
-            val m = Pattern.compile(selector.regExp).matcher(html)
+    private fun urlFromRegExp(selector: Selector, documentUrl: String): String {
+        val html = HtmlDocumentSupport
+            .download(documentUrl, selector.toDownloadOptions())
+            .replace("""([\n\r\t])""".toRegex(), "")
+        selector.image.regExp?.also { regExp ->
+            val m = Pattern.compile(regExp).matcher(html)
             if (m.find()) {
                 val url = m.group(1)
                 if (url != null) {
@@ -72,7 +75,6 @@ class ImageExtractor(private val domSelectors: DomSelectors) {
 
     private suspend fun getDocumentFromUrl(url: String) = coroutineScope {
         val domSelector = domSelectors.getSelectorFromUrl(url)
-        val image = domSelector.image
-        Jsoup.parse(HtmlDocumentSupport.download(url, image.postData?.imgContinue, domSelector.userAgent))
+        Jsoup.parse(HtmlDocumentSupport.download(url, domSelector.toDownloadOptions()))
     }
 }

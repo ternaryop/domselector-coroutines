@@ -5,6 +5,7 @@ import com.ternaryop.photoshelf.api.extractor.ImageGallery
 import com.ternaryop.photoshelf.api.extractor.ImageGalleryResult
 import com.ternaryop.photoshelf.api.extractor.ImageInfo
 import com.ternaryop.photoshelf.api.parser.ParserService
+import com.ternaryop.photoshelf.domselector.util.html.DownloadOptions
 import com.ternaryop.photoshelf.domselector.util.html.HtmlDocumentSupport
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -21,7 +22,7 @@ class GalleryExtractor(private val domSelectors: DomSelectors, private val parse
         val uri = URL(galleryUrl)
         val uriScheme = checkNotNull(uri.protocol) { "Invalid gallery url: $galleryUrl" }
         val selectorFromURL = domSelectors.getSelectorFromUrl(galleryUrl)
-        val html = HtmlDocumentSupport.download(galleryUrl, userAgent = selectorFromURL.userAgent)
+        val html = HtmlDocumentSupport.download(galleryUrl, DownloadOptions(userAgent = selectorFromURL.userAgent))
         val htmlDocument = Jsoup.parse(html)
         val gallerySelector = selectorFromURL.gallery
         val title = findTitle(gallerySelector, htmlDocument)
@@ -80,7 +81,7 @@ class GalleryExtractor(private val domSelectors: DomSelectors, private val parse
         while (element != null) {
             val pageUrl = HtmlDocumentSupport.absUrl(baseuri, element.attr("href"))
             val pageUrlSel = domSelectors.getSelectorFromUrl(pageUrl)
-            val pageDocument = Jsoup.parse(HtmlDocumentSupport.download(pageUrl, userAgent = pageUrlSel.userAgent))
+            val pageDocument = Jsoup.parse(HtmlDocumentSupport.download(pageUrl, DownloadOptions(userAgent = pageUrlSel.userAgent)))
             list += extractImages(pageUrlSel.gallery, pageDocument, pageUrl)
             element = pageDocument.select(selector.multiPage).first()
         }

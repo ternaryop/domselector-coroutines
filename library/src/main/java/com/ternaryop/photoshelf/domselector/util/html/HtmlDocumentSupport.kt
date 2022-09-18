@@ -12,6 +12,11 @@ import java.net.URLEncoder
 private const val BUFFER_SIZE = 200 * 1024
 
 data class SrcSetItem(val width: Int, val url: String)
+data class DownloadOptions(
+    val postData: String? = null,
+    val userAgent: String? = HtmlDocumentSupport.DESKTOP_USER_AGENT,
+    val cookie: String? = null
+)
 
 /**
  * Created by dave on 07/05/15.
@@ -23,25 +28,32 @@ object HtmlDocumentSupport {
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:57.0) Gecko/20100101 Firefox/57.0"
 
     /**
-     * Open connection using the DESKTOP_USER_AGENT
+     * Open connection using the passed options if any
      * @param urlString the url to open
+     * @param downloadOptions the options
      * @return the connection
      * @throws IOException when open fails
      */
     fun openConnection(
         urlString: String,
-        postData: String? = null,
-        userAgent: String? = DESKTOP_USER_AGENT
+        downloadOptions: DownloadOptions? = null
     ): HttpURLConnection {
         var url = URL(urlString)
         var conn: HttpURLConnection
         var location: String
         var continueFollow = true
 
+        val userAgent = downloadOptions?.userAgent ?: DESKTOP_USER_AGENT
+        val postData = downloadOptions?.postData
+
         do {
             conn = url.openConnection() as HttpURLConnection
             conn.setRequestProperty("User-Agent", userAgent)
             conn.instanceFollowRedirects = false
+
+            downloadOptions?.cookie?.also { cookie ->
+                conn.setRequestProperty("Cookie", cookie)
+            }
 
             if (postData != null) {
                 conn.requestMethod = "POST"
@@ -75,13 +87,12 @@ object HtmlDocumentSupport {
 
     fun download(
         url: String,
-        postData: String? = null,
-        userAgent: String? = DESKTOP_USER_AGENT
+        downloadOptions: DownloadOptions? = null
     ): String {
         var connection: HttpURLConnection? = null
 
         try {
-            connection = openConnection(url, postData, userAgent)
+            connection = openConnection(url, downloadOptions)
             ByteArrayOutputStream().use { os ->
                 val bos = BufferedOutputStream(os)
                 connection.inputStream?.use { it.copyTo(bos, BUFFER_SIZE) }

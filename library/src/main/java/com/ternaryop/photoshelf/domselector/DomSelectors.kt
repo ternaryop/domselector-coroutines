@@ -45,10 +45,11 @@ class Image(
     val regExp: String? = null,
     val pageChain: List<PageChain>? = null,
     val postData: PostData? = null,
-    val selAttr: String = "src"
+    val selAttr: String = "src",
+    val cookie: String? = null,
 ) {
     val hasImage: Boolean
-        get() = css !== null || regExp !== null || pageChain !== null
+        get() = css !== null || regExp !== null || pageChain !== null || cookie !== null
 }
 
 @JsonClass(generateAdapter = true)
